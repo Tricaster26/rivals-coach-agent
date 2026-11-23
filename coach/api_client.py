@@ -2,8 +2,12 @@ from typing import Literal
 
 import httpx
 
-Endpoint = Literal["match-context", "pick-alternatives", "match-performance"]
+Endpoint = Literal["match-context", "pick-alternatives", "match-performance", "eligibility"]
 Phase = Literal["pre", "post"]
+
+
+class AnalysisApiError(Exception):
+    pass
 
 
 class AnalysisApiClient:
@@ -18,8 +22,8 @@ class AnalysisApiClient:
         try:
             response = self.http.get(f"/analysis/{endpoint}", params=params)
         except httpx.ConnectError as error:
-            raise SystemExit(f"Can't reach the backend at {self.http.base_url}. Is it running?") from error
+            raise AnalysisApiError(f"Can't reach the backend at {self.http.base_url}. Is it running?") from error
 
         if response.is_error:
-            raise SystemExit(f"/analysis/{endpoint} returned {response.status_code}: {response.text}")
+            raise AnalysisApiError(f"/analysis/{endpoint} returned {response.status_code}: {response.text}")
         return response.json()

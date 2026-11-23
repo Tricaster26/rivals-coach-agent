@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 AGENT_DIR = Path(__file__).resolve().parents[1]
 RUNS_DIR = AGENT_DIR / "runs"
+DEFAULT_FRONTEND_ORIGIN = "http://localhost:3000"
 
 REQUIRED_VARIABLES = ["ANALYSIS_API_URL", "ANALYSIS_API_KEY", "GROQ_API_KEY", "GROQ_MODEL", "GAME_DATA_DIR"]
 
@@ -17,6 +18,7 @@ class Settings:
     groq_api_key: str
     groq_model: str
     game_data_dir: Path
+    frontend_origin: str
 
 
 def load_settings() -> Settings:
@@ -35,4 +37,5 @@ def load_settings() -> Settings:
         groq_api_key=os.environ["GROQ_API_KEY"],
         groq_model=os.environ["GROQ_MODEL"],
         game_data_dir=game_data_dir,
+        frontend_origin=os.getenv("FRONTEND_ORIGIN", DEFAULT_FRONTEND_ORIGIN),
     )
