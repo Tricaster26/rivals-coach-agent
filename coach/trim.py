@@ -27,6 +27,14 @@ def drop_empty_bans(match_context: dict) -> None:
     match_context["bans"] = real_bans
 
 
+def drop_alternatives_without_switch(pick_alternatives: dict) -> None:
+    current_pick = pick_alternatives.get("currentPick") or {}
+    if current_pick.get("switchWorthConsidering"):
+        return
+    current_pick.pop("reasons", None)
+    pick_alternatives.pop("alternatives", None)
+
+
 def slim_post_match_context(match_context: dict) -> dict:
     return {
         "mapId": match_context["mapId"],

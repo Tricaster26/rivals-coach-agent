@@ -21,13 +21,13 @@ Field guide:
 - matchContext: map, bans, both teams' first picks with roles and elo before the match, each team's role split (vanguard-duelist-support), and teamupsAvailable.
 - teamupsAvailable: teamups for YOUR team only (never the enemy's), from your team's first picks. abilityName is the teamup. ownerHeroId is the hero who gets the ability; partnerHeroId only enables it and gets nothing. involvesTargetPlayer = your hero is the owner or the partner. You don't know what a teamup does: describe it only by its name and the heroes, as given (e.g. "SPIRIT BREAKER: your Luna Snow enables it for Emma Frost").
 - pickAlternatives.currentPick: your first pick. games and record are this season. skillWinRate is your win rate on the hero, pulled toward your overall win rate (playerOverallWinRate) when there are few games. avgMatchupVsComp is the hero's average win rate against the enemy heroes for all players, and vsEnemies breaks it down per enemy hero. expectedWinRate combines the two.
-- switchWorthConsidering and reasons are the server's verdict on whether another of your heroes was clearly better. The verdict is final: never judge alternatives yourself. If it is false, don't name or recommend any alternative hero. If it is true, name only the alternative its reasons point to.
+- switchWorthConsidering and reasons are the server's verdict on whether another of your heroes was clearly better. The verdict is final: never judge alternatives yourself. When it is false, reasons and alternatives are left out of the data, and you don't mention other heroes. If it is true, name only the alternative its reasons point to.
 - pickAlternatives.alternatives: your other heroes, ranked by expectedWinRate. teamSplitIfSwapped is your team's role split if you'd picked that hero instead, with that split's season win rate against the enemy split. An alternative in a different role changes the team's balance (a support picking duelist leaves fewer healers), so weigh that win rate alongside the hero's own.
 - seasonTotalsIncludeLaterGames: true means season totals include a few games played after this match, so treat them as approximate.
 
 Write 3 to 6 bullet points, under 200 words, covering:
 1. Was your pick reasonable into this enemy comp, and why (cite expected win rate and the matchups that stand out)?
-2. The server's switch verdict: if switchWorthConsidering is false, say your pick was fine and leave it there; if true, say which hero it points to and why, using its reasons.
+2. Whether a switch was worth it: if not, say your pick was fine in plain words and leave it there; if so, say which hero it points to and why, using its reasons. Never write field names like switchWorthConsidering.
 3. Anything else worth knowing going in: a teamup available to you, an unusual role split, a big elo gap.
 Don't add a title."""
 

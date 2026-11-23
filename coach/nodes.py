@@ -10,6 +10,7 @@ from coach.run_log import RunLog
 from coach.state import CoachState
 from coach.swap_summary import build_swap_summary
 from coach.trim import (
+    drop_alternatives_without_switch,
     drop_empty_bans,
     drop_matchup_lists_for_unplayed_heroes,
     drop_unused_fields,
@@ -29,9 +30,11 @@ class CoachNodes:
         player_id = state["player_id"]
         match_context = self.api_client.get("match-context", match_id, player_id, "pre")
         drop_empty_bans(match_context)
+        pick_alternatives = self.api_client.get("pick-alternatives", match_id, player_id, "pre")
+        drop_alternatives_without_switch(pick_alternatives)
         raw_pre_data = {
             "matchContext": match_context,
-            "pickAlternatives": self.api_client.get("pick-alternatives", match_id, player_id, "pre"),
+            "pickAlternatives": pick_alternatives,
         }
         pre_data = drop_unused_fields(self.name_resolver.resolve(raw_pre_data))
         self.run_log.save_json("1-pre-data.json", pre_data)
