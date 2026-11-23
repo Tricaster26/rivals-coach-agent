@@ -137,6 +137,8 @@ def review_team(team: dict, changed_role: bool) -> dict:
     reviewed_team = {}
     for stat_name, team_stat in team.items():
         kept_fields = dict(team_stat)
+        if "gap" in kept_fields:
+            kept_fields["teamGapAgainstEnemyTeam"] = kept_fields.pop("gap")
         if changed_role and stat_name not in ROLE_NEUTRAL_STATS:
             kept_fields.pop("targetPlayerShare", None)
         reviewed_team[stat_name] = kept_fields
