@@ -9,7 +9,12 @@ from coach.review_rules import apply_review_rules
 from coach.run_log import RunLog
 from coach.state import CoachState
 from coach.swap_summary import build_swap_summary
-from coach.trim import drop_matchup_lists_for_unplayed_heroes, drop_unused_fields, slim_post_match_context
+from coach.trim import (
+    drop_empty_bans,
+    drop_matchup_lists_for_unplayed_heroes,
+    drop_unused_fields,
+    slim_post_match_context,
+)
 
 
 class CoachNodes:
@@ -22,8 +27,10 @@ class CoachNodes:
     def fetch_pre(self, state: CoachState) -> CoachState:
         match_id = state["match_id"]
         player_id = state["player_id"]
+        match_context = self.api_client.get("match-context", match_id, player_id, "pre")
+        drop_empty_bans(match_context)
         raw_pre_data = {
-            "matchContext": self.api_client.get("match-context", match_id, player_id, "pre"),
+            "matchContext": match_context,
             "pickAlternatives": self.api_client.get("pick-alternatives", match_id, player_id, "pre"),
         }
         pre_data = drop_unused_fields(self.name_resolver.resolve(raw_pre_data))

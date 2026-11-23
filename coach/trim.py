@@ -16,6 +16,17 @@ def drop_unused_fields(value: Any) -> Any:
     return value
 
 
+EMPTY_BAN_ID = "0"
+
+
+def drop_empty_bans(match_context: dict) -> None:
+    real_bans = []
+    for ban in match_context.get("bans", []):
+        if ban != EMPTY_BAN_ID:
+            real_bans.append(ban)
+    match_context["bans"] = real_bans
+
+
 def slim_post_match_context(match_context: dict) -> dict:
     return {
         "mapId": match_context["mapId"],

@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-FOUR_DIGIT_ID = re.compile(r"\b\d{4}\b")
+HERO_ID = re.compile(r"\b\d{4,5}\b")
 ROLE_NAMES = {0: "vanguard", 1: "duelist", 2: "support"}
 
 
@@ -15,10 +15,11 @@ class NameResolver:
     def __init__(self, game_data_dir: Path):
         self.hero_names: dict[str, str] = {}
         self.hero_roles: dict[str, str] = {}
-        
+
         for hero in read_json(game_data_dir / "heroes.json"):
-            self.hero_names[str(hero["id"])] = hero["name"]
-            self.hero_roles[str(hero["id"])] = ROLE_NAMES[hero["role"]]
+            self.add_hero(hero)
+            for variant in hero.get("variants", []):
+                self.add_hero(variant)
 
         self.map_names: dict[str, str] = {}
         for game_map in read_json(game_data_dir / "maps.json"):
@@ -26,6 +27,11 @@ class NameResolver:
             for id_field in ["rankedId", "quickPlayId"]:
                 if id_field in game_map:
                     self.map_names[str(game_map[id_field])] = label
+
+    def add_hero(self, hero: dict) -> None:
+        hero_id = str(hero["id"])
+        self.hero_names[hero_id] = hero["name"]
+        self.hero_roles[hero_id] = ROLE_NAMES[hero["role"]]
 
     def resolve(self, value: Any, key: str | None = None) -> Any:
         if isinstance(value, dict):
@@ -35,7 +41,7 @@ class NameResolver:
         if isinstance(value, str):
             if key == "mapId":
                 return self.map_names.get(value, value)
-            return FOUR_DIGIT_ID.sub(self.hero_name_for, value)
+            return HERO_ID.sub(self.hero_name_for, value)
         return value
 
     def hero_name_for(self, id_match: re.Match) -> str:
