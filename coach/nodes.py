@@ -8,6 +8,7 @@ from coach.highlight_candidates import build_highlight_candidates
 from coach.review_rules import apply_review_rules
 from coach.run_log import RunLog
 from coach.state import CoachState
+from coach.splits import describe_splits
 from coach.swap_summary import build_swap_summary
 from coach.teamups import describe_teamups
 from coach.trim import (
@@ -39,6 +40,7 @@ class CoachNodes:
         }
         pre_data = drop_unused_fields(self.name_resolver.resolve(raw_pre_data))
         describe_teamups(pre_data["matchContext"])
+        describe_splits(pre_data)
         self.run_log.save_json("1-pre-data.json", pre_data)
         return {"pre_data": pre_data}
 
@@ -67,6 +69,7 @@ class CoachNodes:
             "pickAlternatives": pick_alternatives,
         }
         post_data = drop_unused_fields(self.name_resolver.resolve(raw_post_data))
+        describe_splits(post_data)
         self.run_log.save_json("3-post-data.json", post_data)
         return {"post_data": post_data}
 
