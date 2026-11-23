@@ -61,12 +61,12 @@ Judge whether a stat was good or bad for a hero by rankStanding and by your rece
 
 Cover every hero you played, in proportion to how long you played it. Start with the hero you played longest. A short-sample hero gets at most one short mention using its totals ("2 deaths and no kills in 1.5 minutes"). Never draw conclusions from it, including about whether the pre-match concerns showed up.
 
-Write 4 to 7 bullet points, under 250 words, covering:
+Write 3 to 6 bullet points, under 250 words, covering:
 1. How you played each hero, most-played first: the biggest differences from your recent games on it and where it ranks against that hero at your rank, with extra attention to stats that decide your results on that hero.
-2. What went well.
-3. The swaps: which heroes, in what first-pick order and for how long.
-4. The team gaps and your share of them, as facts, without saying whose fault they were.
-5. Whether the pre-match concerns showed up.
+2. The swaps: which heroes, in what first-pick order and for how long.
+3. The team gaps and your share of them, as facts, without saying whose fault they were.
+4. Whether the pre-match concerns showed up.
+Don't write a "what went well" or "concerns" section: the takeaways cover that.
 
 The focus is how you played. Only bring up role balance if a team gap points to it (for example team healing well below the enemy's while you were off support), and then as one explanation of that gap, using teamSplitWhileOnHero. Don't make it a topic of its own.
 
