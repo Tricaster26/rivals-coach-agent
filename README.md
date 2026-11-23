@@ -4,6 +4,16 @@ An LLM coaching agent for Marvel Rivals. Given one ranked match and a player, it
 
 Built with LangGraph, using `openai/gpt-oss-120b` served through Groq. Match data comes from a separate stats backend's `/analysis/*` endpoints.
 
+## Example
+
+The coach opens from a match page:
+
+![AI Coach button on a match page](docs/coach-button.png)
+
+and writes its report in a chat panel:
+
+![Coach panel with a full match report](docs/coach-panel.png)
+
 ## Pipeline
 
 ```
