@@ -75,3 +75,11 @@ python run.py --match <matchId> --player <playerId> [--reasoning low|medium|high
 ```
 
 The report is printed and saved, with every step's data, prompt and output, to `runs/<timestamp>-<matchId>/`.
+
+To step through the graph in LangGraph Studio:
+
+```
+langgraph dev
+```
+
+Start a run with `{"match_id": "...", "player_id": "..."}` as input. Reasoning defaults to `medium`; set `reasoning` in the assistant's configurable to change it. Studio runs save to `runs/<timestamp>-studio/`.

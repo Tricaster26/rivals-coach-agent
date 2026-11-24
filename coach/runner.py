@@ -24,6 +24,16 @@ NEXT_LLM_STEP: dict[str, LlmStep] = {
 }
 
 
+def create_llm(settings: Settings, reasoning: Reasoning) -> ChatGroq:
+    return ChatGroq(
+        model=settings.groq_model,
+        api_key=settings.groq_api_key,
+        reasoning_effort=reasoning,
+        max_tokens=MAX_OUTPUT_TOKENS,
+        max_retries=MAX_RETRIES,
+    )
+
+
 class CoachRunner:
     def __init__(self, settings: Settings):
         self.settings = settings
@@ -32,13 +42,7 @@ class CoachRunner:
         self.last_run_log: RunLog | None = None
 
     def run(self, match_id: str, player_id: str, reasoning: Reasoning) -> Iterator[LlmStep | dict]:
-        llm = ChatGroq(
-            model=self.settings.groq_model,
-            api_key=self.settings.groq_api_key,
-            reasoning_effort=reasoning,
-            max_tokens=MAX_OUTPUT_TOKENS,
-            max_retries=MAX_RETRIES,
-        )
+        llm = create_llm(self.settings, reasoning)
         run_log = RunLog(RUNS_DIR, match_id)
         self.last_run_log = run_log
         nodes = CoachNodes(

@@ -9,14 +9,14 @@ class RunLog:
     def __init__(self, runs_dir: Path, match_id: str):
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         self.folder = runs_dir / f"{timestamp}-{match_id}"
-        self.folder.mkdir(parents=True)
         self.usage_rows: list[dict] = []
 
     def save_json(self, file_name: str, data: object) -> None:
         text = json.dumps(data, indent=2, ensure_ascii=False)
-        (self.folder / file_name).write_text(text, encoding="utf-8")
+        self.save_text(file_name, text)
 
     def save_text(self, file_name: str, text: str) -> None:
+        self.folder.mkdir(parents=True, exist_ok=True)
         (self.folder / file_name).write_text(text, encoding="utf-8")
 
     def save_llm_step(self, step_name: str, system_prompt: str, user_message: str, response: AIMessage) -> None:
