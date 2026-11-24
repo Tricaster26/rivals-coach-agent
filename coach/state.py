@@ -9,3 +9,4 @@ class CoachState(TypedDict, total=False):
     post_data: dict
     post_analysis: str
     takeaways: str
+    takeaway_claims: dict

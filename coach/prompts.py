@@ -94,15 +94,16 @@ How to choose:
 
 Voice: second person ("you"), like a coach reviewing the game with the player. Specific and honest, not commanding: no "do X" orders and no first person. Say how strong or unusual something was ("top 1% of Magik games at Diamond+", "a quarter of your team's deaths"). Label per-minute numbers as "per min", or use the match total.
 
-Write 0 to 3 points in each section. Use exactly this format and nothing else:
+Write 0 to 3 claims in each section. Reply with only this JSON object:
 
-### What went well
-- ...
+{"wentWell": [CLAIM, ...], "concerning": [CLAIM, ...]}
 
-### What stood out as concerning
-- ...
+Each CLAIM is {"claim": "...", "modelConfidence": 0-100, "basis": ["...", ...]}:
+- claim: one point, written for the player, in the voice above.
+- modelConfidence: how confident you are that this claim is correct, from 0 to 100.
+- basis: every candidate field the claim relies on, as "<hero>.<stat>.<field>" (e.g. "Luna Snow.damageTaken.rankStanding"), "teamShares.<stat>.<field>", "swapSummary.<field>" or "result".
 
-If nothing belongs in a section, write one line instead of points: "Nothing stood out." for What went well, or "Nothing concerning stood out." for the other."""
+Leave a section as an empty list if nothing belongs in it."""
 
 
 def compact_json(data: dict) -> str:

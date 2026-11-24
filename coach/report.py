@@ -21,6 +21,7 @@ def build_report(final_state: CoachState) -> dict:
         "preMatch": final_state["pre_analysis"],
         "postMatch": final_state["post_analysis"],
         "takeaways": final_state["takeaways"],
+        "takeawayClaims": final_state["takeaway_claims"],
     }
 
 

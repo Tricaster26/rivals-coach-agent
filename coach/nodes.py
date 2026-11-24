@@ -10,6 +10,7 @@ from coach.run_log import RunLog
 from coach.state import CoachState
 from coach.splits import describe_splits
 from coach.swap_summary import build_swap_summary
+from coach.takeaways import parse_takeaway_claims, takeaways_markdown
 from coach.teamups import describe_teamups
 from coach.trim import (
     drop_alternatives_without_switch,
@@ -19,11 +20,14 @@ from coach.trim import (
     slim_post_match_context,
 )
 
+JSON_RESPONSE_FORMAT = {"type": "json_object"}
+
 
 class CoachNodes:
     def __init__(self, api_client: AnalysisApiClient, llm: ChatGroq, name_resolver: NameResolver, run_log: RunLog):
         self.api_client = api_client
         self.llm = llm
+        self.json_llm = llm.bind(response_format=JSON_RESPONSE_FORMAT)
         self.name_resolver = name_resolver
         self.run_log = run_log
 
@@ -84,12 +88,14 @@ class CoachNodes:
         user_message = prompts.takeaways_user_message(
             state["pre_analysis"], state["post_analysis"], highlight_candidates
         )
-        takeaways = self.ask("5-takeaways", prompts.TAKEAWAYS_SYSTEM_PROMPT, user_message)
-        return {"takeaways": takeaways}
+        takeaways_json = self.ask("5-takeaways", prompts.TAKEAWAYS_SYSTEM_PROMPT, user_message, json_reply=True)
+        takeaway_claims = parse_takeaway_claims(takeaways_json)
+        return {"takeaways": takeaways_markdown(takeaway_claims), "takeaway_claims": takeaway_claims}
 
-    def ask(self, step_name: str, system_prompt: str, user_message: str) -> str:
+    def ask(self, step_name: str, system_prompt: str, user_message: str, json_reply: bool = False) -> str:
         print(f"  {step_name}...", flush=True)
         messages = [SystemMessage(system_prompt), HumanMessage(user_message)]
-        response: AIMessage = self.llm.invoke(messages)
+        llm = self.json_llm if json_reply else self.llm
+        response: AIMessage = llm.invoke(messages)
         self.run_log.save_llm_step(step_name, system_prompt, user_message, response)
         return str(response.content).strip()
