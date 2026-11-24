@@ -1,10 +1,10 @@
 import argparse
 import sys
 
-from coach.api_client import AnalysisApiError
+from coach.sources.api_client import AnalysisApiError
 from coach.config import load_settings
-from coach.report import report_markdown
-from coach.run_log import RunLog
+from coach.output.report import report_markdown
+from coach.output.run_log import RunLog
 from coach.runner import CoachRunner
 
 TEST_MATCH_ID = "5026135_1792074134_1231047_11001_22"

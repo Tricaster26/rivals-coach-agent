@@ -3,13 +3,13 @@ from typing import Literal
 
 from langchain_groq import ChatGroq
 
-from coach.api_client import AnalysisApiClient
+from coach.sources.api_client import AnalysisApiClient
 from coach.config import RUNS_DIR, Settings
-from coach.game_data import NameResolver
-from coach.graph import build_graph
-from coach.nodes import CoachNodes
-from coach.report import REPORT_FILE, build_report, report_markdown
-from coach.run_log import RunLog
+from coach.sources.game_data import NameResolver
+from coach.pipeline.graph import build_graph
+from coach.pipeline.nodes import CoachNodes
+from coach.output.report import REPORT_FILE, build_report, report_markdown
+from coach.output.run_log import RunLog
 
 Reasoning = Literal["low", "medium", "high"]
 LlmStep = Literal["analyze_pre", "analyze_post", "write_takeaways"]

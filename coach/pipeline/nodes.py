@@ -1,18 +1,18 @@
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_groq import ChatGroq
 
-from coach import prompts
-from coach.api_client import AnalysisApiClient
-from coach.game_data import NameResolver
-from coach.highlight_candidates import build_highlight_candidates
-from coach.review_rules import apply_review_rules
-from coach.run_log import RunLog
-from coach.state import CoachState
-from coach.splits import describe_splits
-from coach.swap_summary import build_swap_summary
-from coach.takeaways import parse_takeaway_claims, takeaways_markdown
-from coach.teamups import describe_teamups
-from coach.trim import (
+from coach.llm import prompts
+from coach.sources.api_client import AnalysisApiClient
+from coach.sources.game_data import NameResolver
+from coach.shaping.highlight_candidates import build_highlight_candidates
+from coach.shaping.review_rules import apply_review_rules
+from coach.output.run_log import RunLog
+from coach.pipeline.state import CoachState
+from coach.shaping.splits import describe_splits
+from coach.shaping.swap_summary import build_swap_summary
+from coach.llm.takeaways import parse_takeaway_claims, takeaways_markdown
+from coach.shaping.teamups import describe_teamups
+from coach.shaping.trim import (
     drop_alternatives_without_switch,
     drop_empty_bans,
     drop_matchup_lists_for_unplayed_heroes,

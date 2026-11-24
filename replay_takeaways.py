@@ -5,12 +5,12 @@ from pathlib import Path
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from coach import prompts
+from coach.llm import prompts
 from coach.config import RUNS_DIR, load_settings
-from coach.nodes import JSON_RESPONSE_FORMAT
-from coach.run_log import RunLog
+from coach.pipeline.nodes import JSON_RESPONSE_FORMAT
+from coach.output.run_log import RunLog
 from coach.runner import create_llm
-from coach.takeaways import parse_takeaway_claims, takeaways_markdown
+from coach.llm.takeaways import parse_takeaway_claims, takeaways_markdown
 
 REPLAY_SUFFIX = "takeaways-replay"
 

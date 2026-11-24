@@ -1,7 +1,7 @@
 {
   "dependencies": ["."],
   "graphs": {
-    "coach": "./coach/studio.py:make_graph"
+    "coach": "./coach/pipeline/studio.py:make_graph"
   },
   "env": ".env"
 }

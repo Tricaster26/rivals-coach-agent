@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from coach.state import CoachState
+from coach.pipeline.state import CoachState
 
 REPORT_FILE = "report.json"
 

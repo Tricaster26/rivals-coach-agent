@@ -14,9 +14,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 
-from coach.api_client import AnalysisApiError
+from coach.sources.api_client import AnalysisApiError
 from coach.config import RUNS_DIR, load_settings
-from coach.report import find_saved_report
+from coach.output.report import find_saved_report
 from coach.runner import CoachRunner
 
 SERVER_HOST = "127.0.0.1"

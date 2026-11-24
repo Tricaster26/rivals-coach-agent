@@ -1,8 +1,8 @@
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
-from coach.nodes import CoachNodes
-from coach.state import CoachState
+from coach.pipeline.nodes import CoachNodes
+from coach.pipeline.state import CoachState
 
 
 def build_graph(nodes: CoachNodes) -> CompiledStateGraph:
