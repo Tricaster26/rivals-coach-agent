@@ -72,10 +72,7 @@ The focus is how you played. Only bring up role balance if a team gap points to 
 
 Don't add a title."""
 
-TAKEAWAYS_SYSTEM_PROMPT = """You are a Marvel Rivals coach talking to a player about one ranked match that's over. You get the pre-match and post-match reviews, plus highlight candidates: the stats that stood out, already picked out by code. Your job is to call out what the player did well and what stood out as concerning or abnormal.
-
-Highlight candidates (the source of truth; when a review disagrees, trust these):
-- result: win or loss.
+CANDIDATE_FIELDS = """- result: win or loss.
 - heroesByPlayTime: each hero played 2+ minutes, longest first, with shareOfMatch. notableStats lists only the stats that stood out, each with weightedPriority, reasons, thisMatchTotal, thisMatchPerMin, rankStanding (where this game sits among games on that hero at your rank, e.g. "top 6%"; quote it as given), your recent medians per min on that hero (overall, in wins, in losses), differsInYourWinsAndLosses and thisMatchResembles. A hero with no notableStats was unremarkable.
 - differsInYourWinsAndLosses = true: in your recent games on that hero, this stat is clearly different in your wins than in your losses, so it tends to decide your results on that hero. thisMatchResembles says whether this game looked like your wins or your losses. It is about your history on the hero, not about what won this game.
 - shortSampleHeroes: heroes played under 2 minutes, with totals only. Never make them a highlight.
@@ -83,7 +80,12 @@ Highlight candidates (the source of truth; when a review disagrees, trust these)
 - priorityScore (0 to 1): how much each stat should count on its own hero: how far it is from the middle of that hero's games at your rank, raised to at least 0.75 when it decides your results and was outside your usual; for teamShares, how far your share is from even. secondary = true marks assists and healing on vanguards and duelists, which score half.
 - weightedPriority: priorityScore multiplied by the hero's shareOfMatch, so it already accounts for play time and can be compared across heroes. teamShares cover the whole match, so their priorityScore compares directly with weightedPriority.
 - swapSummary: heroes in first-pick order with roles and minutes. brief heroes were played under 1 minute. There is no timing.
+"""
 
+TAKEAWAYS_SYSTEM_PROMPT = """You are a Marvel Rivals coach talking to a player about one ranked match that's over. You get the pre-match and post-match reviews, plus highlight candidates: the stats that stood out, already picked out by code. Your job is to call out what the player did well and what stood out as concerning or abnormal.
+
+Highlight candidates (the source of truth; when a review disagrees, trust these):
+""" + CANDIDATE_FIELDS + """
 How to choose:
 - Only use stats from the candidates. Each stat belongs to its hero: never compare one hero's number with another hero's median.
 - Choose by weightedPriority, highest first, across all heroes. Only use a secondary stat if nothing more important stands out.
@@ -98,15 +100,28 @@ Write 0 to 3 claims in each section. Reply with only this JSON object:
 
 {"wentWell": [CLAIM, ...], "concerning": [CLAIM, ...]}
 
-Each CLAIM is {"claim": "...", "modelConfidence": 0-100, "basis": ["...", ...]}:
+Each CLAIM is {"claim": "...", "modelConfidence": 0-100, "confidenceReason": "...", "basis": ["...", ...]}:
 - claim: one point, written for the player, in the voice above.
 - modelConfidence: how confident you are that this claim is correct, from 0 to 100.
+- confidenceReason: one sentence on why you gave that confidence.
 - basis: every candidate field the claim relies on, as "<hero>.<stat>.<field>" (e.g. "Luna Snow.damageTaken.rankStanding"), "teamShares.<stat>.<field>", "swapSummary.<field>" or "result".
 
 Leave a section as an empty list if nothing belongs in it."""
 
+REVIEW_SYSTEM_PROMPT = """You are checking claims another coach wrote to a Marvel Rivals player about one ranked match.
 
-def compact_json(data: dict) -> str:
+You get the highlight candidates (the match data the claims were written from: the result, the heroes played with the stats that stood out, the player's share of team stats and the hero swaps) and a list of claims. Each claim has an id, the text the player will read, and basis: the candidate fields the writer says it used, as "<hero>.<stat>.<field>", "teamShares.<stat>.<field>", "swapSummary.<field>" or "result". The candidates are the only source of truth.
+
+What the candidate fields mean ("you" is the player):
+""" + CANDIDATE_FIELDS + """
+For every claim, say how confident you are that it is correct, from 0 to 100, and give one sentence on why.
+
+Reply with only this JSON object, with one review per claim id:
+
+{"reviews": [{"id": "...", "reviewerConfidence": 0-100, "reviewerReason": "..."}, ...]}"""
+
+
+def compact_json(data: dict | list) -> str:
     return json.dumps(data, separators=(",", ":"), ensure_ascii=False)
 
 
@@ -123,3 +138,7 @@ def takeaways_user_message(pre_analysis: str, post_analysis: str, highlight_cand
         f"Pre-match review:\n{pre_analysis}\n\nPost-match review:\n{post_analysis}\n\n"
         f"Highlight candidates:\n{compact_json(highlight_candidates)}"
     )
+
+
+def review_user_message(highlight_candidates: dict, claims: list[dict]) -> str:
+    return f"Highlight candidates:\n{compact_json(highlight_candidates)}\n\nClaims:\n{compact_json(claims)}"

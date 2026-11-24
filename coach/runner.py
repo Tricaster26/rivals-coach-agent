@@ -15,6 +15,7 @@ Reasoning = Literal["low", "medium", "high"]
 LlmStep = Literal["analyze_pre", "analyze_post", "write_takeaways"]
 
 MAX_OUTPUT_TOKENS = 2500
+REVIEWER_MAX_OUTPUT_TOKENS = 1000
 MAX_RETRIES = 6
 
 NEXT_LLM_STEP: dict[str, LlmStep] = {
@@ -30,6 +31,17 @@ def create_llm(settings: Settings, reasoning: Reasoning) -> ChatGroq:
         api_key=settings.groq_api_key,
         reasoning_effort=reasoning,
         max_tokens=MAX_OUTPUT_TOKENS,
+        max_retries=MAX_RETRIES,
+    )
+
+
+def create_reviewer_llm(settings: Settings, reasoning: Reasoning) -> ChatGroq:
+    return ChatGroq(
+        model=settings.reviewer_model,
+        api_key=settings.groq_api_key,
+        reasoning_effort=reasoning,
+        reasoning_format="parsed",
+        max_tokens=REVIEWER_MAX_OUTPUT_TOKENS,
         max_retries=MAX_RETRIES,
     )
 

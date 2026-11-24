@@ -1,7 +1,8 @@
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_groq import ChatGroq
 
 from coach.llm import prompts
+from coach.llm.ask import ask
+from coach.llm.takeaways import takeaways_markdown, write_takeaway_claims
 from coach.sources.api_client import AnalysisApiClient
 from coach.sources.game_data import NameResolver
 from coach.shaping.highlight_candidates import build_highlight_candidates
@@ -10,7 +11,6 @@ from coach.output.run_log import RunLog
 from coach.pipeline.state import CoachState
 from coach.shaping.splits import describe_splits
 from coach.shaping.swap_summary import build_swap_summary
-from coach.llm.takeaways import parse_takeaway_claims, takeaways_markdown
 from coach.shaping.teamups import describe_teamups
 from coach.shaping.trim import (
     drop_alternatives_without_switch,
@@ -20,14 +20,17 @@ from coach.shaping.trim import (
     slim_post_match_context,
 )
 
-JSON_RESPONSE_FORMAT = {"type": "json_object"}
-
 
 class CoachNodes:
-    def __init__(self, api_client: AnalysisApiClient, llm: ChatGroq, name_resolver: NameResolver, run_log: RunLog):
+    def __init__(
+        self,
+        api_client: AnalysisApiClient,
+        llm: ChatGroq,
+        name_resolver: NameResolver,
+        run_log: RunLog,
+    ):
         self.api_client = api_client
         self.llm = llm
-        self.json_llm = llm.bind(response_format=JSON_RESPONSE_FORMAT)
         self.name_resolver = name_resolver
         self.run_log = run_log
 
@@ -50,7 +53,7 @@ class CoachNodes:
 
     def analyze_pre(self, state: CoachState) -> CoachState:
         user_message = prompts.pre_user_message(state["pre_data"])
-        pre_analysis = self.ask("2-analyze-pre", prompts.PRE_SYSTEM_PROMPT, user_message)
+        pre_analysis = ask(self.llm, self.run_log, "2-analyze-pre", prompts.PRE_SYSTEM_PROMPT, user_message)
         return {"pre_analysis": pre_analysis}
 
     def fetch_post(self, state: CoachState) -> CoachState:
@@ -79,23 +82,17 @@ class CoachNodes:
 
     def analyze_post(self, state: CoachState) -> CoachState:
         user_message = prompts.post_user_message(state["post_data"], state["pre_analysis"])
-        post_analysis = self.ask("4-analyze-post", prompts.POST_SYSTEM_PROMPT, user_message)
+        post_analysis = ask(self.llm, self.run_log, "4-analyze-post", prompts.POST_SYSTEM_PROMPT, user_message)
         return {"post_analysis": post_analysis}
 
     def write_takeaways(self, state: CoachState) -> CoachState:
         highlight_candidates = build_highlight_candidates(state["post_data"])
         self.run_log.save_json("5-highlight-candidates.json", highlight_candidates)
-        user_message = prompts.takeaways_user_message(
-            state["pre_analysis"], state["post_analysis"], highlight_candidates
+        takeaway_claims = write_takeaway_claims(
+            self.llm, self.run_log, state["pre_analysis"], state["post_analysis"], highlight_candidates
         )
-        takeaways_json = self.ask("5-takeaways", prompts.TAKEAWAYS_SYSTEM_PROMPT, user_message, json_reply=True)
-        takeaway_claims = parse_takeaway_claims(takeaways_json)
-        return {"takeaways": takeaways_markdown(takeaway_claims), "takeaway_claims": takeaway_claims}
-
-    def ask(self, step_name: str, system_prompt: str, user_message: str, json_reply: bool = False) -> str:
-        print(f"  {step_name}...", flush=True)
-        messages = [SystemMessage(system_prompt), HumanMessage(user_message)]
-        llm = self.json_llm if json_reply else self.llm
-        response: AIMessage = llm.invoke(messages)
-        self.run_log.save_llm_step(step_name, system_prompt, user_message, response)
-        return str(response.content).strip()
+        return {
+            "highlight_candidates": highlight_candidates,
+            "takeaway_claims": takeaway_claims,
+            "takeaways": takeaways_markdown(takeaway_claims),
+        }

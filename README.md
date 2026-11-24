@@ -82,4 +82,11 @@ To step through the graph in LangGraph Studio:
 langgraph dev
 ```
 
-Start a run with `{"match_id": "...", "player_id": "..."}` as input. Reasoning defaults to `medium`; set `reasoning` in the assistant's configurable to change it. Studio runs save to `runs/<timestamp>-studio/`.
+To compare how well the writer (`gpt-oss-120b`) and a reviewer model (`qwen/qwen3.8-27b`) judge their confidence in each takeaway:
+
+```
+python confidence_experiment.py run              # replay saved runs, write experiments/<timestamp>/claims.json
+python confidence_experiment.py score --experiment <timestamp>   # after labelling each claim correct or not
+```
+
+Start a Studio run with `{"match_id": "...", "player_id": "..."}` as input. Reasoning defaults to `medium`; set `reasoning` in the assistant's configurable to change it. Studio runs save to `runs/<timestamp>-studio/`.
