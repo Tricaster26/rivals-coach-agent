@@ -1,5 +1,7 @@
 import json
 
+STRENGTH_WORDS = """"exceptional" allows words like extremely, outstanding, massive or one of the best/lowest; "very" allows very, strong, well above/below or far above/below; "mild" allows only plain words like above, below, high or low. Never describe it more strongly than its strength. The strength only guides your word choice: never write the label itself or the word "strength", and never say a stat was "marked" or "rated" anything."""
+
 COACH_RULES = """You are a Marvel Rivals coach reviewing one ranked match for one player. Talk to them as "you".
 
 Rules:
@@ -47,14 +49,16 @@ Field guide:
 - stats: sorted by priorityScore. Damage, damage taken and healing are left out when your usual amount on that hero is under 100 per min. For each stat:
   - priorityScore (0 to 1): how much the stat should count. It's how far the stat is from the middle of that hero's games at your rank, raised to at least 0.75 when the stat decides your results and was outside your usual. secondary = true marks assists and healing on vanguards and duelists, which score half. Lead with high-scoring stats; mention secondary stats only if nothing more important stands out.
   - reasons: why the stat stands out. "high for this hero" / "low for this hero" = compared with other games on that hero at your rank (not whether it was good). "good: few deaths" / "concerning: many deaths" for deaths. "decides your results; outside your usual" = differsInYourWinsAndLosses is true and this game was outside your usual band on that hero. No reasons means the stat was unremarkable.
-  - rankStanding: where this game sits among single games on that hero by players at your rank tier and above (comparedWithRank.rankTier), e.g. "top 6%", "bottom 14%", "more deaths than 97% of games", or "around average for this hero at your rank". Quote it as given, e.g. "top 6% of Luna Snow games at Diamond+". It compares games, not players.
+  - rankStanding: a sentence the server wrote placing this game among single games on that hero by all players at your rank tier and above, e.g. "more damage taken than 81% of games on this hero by Diamond+ players". Base any rank comparison on it, in your own words, and keep who it compares against: other players' games, never your own games. It compares games, not players.
   - thisMatchTotal: what actually happened (e.g. 10 deaths in 7.1 minutes). Use it when describing the match.
   - thisMatchPerMin vs recentMedianPerMin: this match against your typical game on that hero. vsRecentGames says whether it was higher than, inside or lower than your usual band.
   - recentWinsMedianPerMin / recentLossesMedianPerMin: your typical values in recent wins and losses on that hero.
   - differsInYourWinsAndLosses = true: in your recent games on that hero, this stat is clearly different in your wins than in your losses, so it tends to decide your results on that hero. thisMatchResembles says whether this game looked like your wins or your losses. It is about your history on the hero, not about what won or lost this game.
+  - winsVsLosses: a sentence the server wrote comparing your wins and losses on that hero, and which one this match looked like. Base any wins/losses comparison on it, in your own words; never work out the direction yourself.
+  - strength: the strongest wording the stat allows. """ + STRENGTH_WORDS + """
 
 rankStanding and differsInYourWinsAndLosses are separate: a stat can be exceptional against other players without being one that decides your results, and the reverse. Only call a stat one that decides your results when differsInYourWinsAndLosses is true.
-- matchPerformance.team: team totals for each stat and the gap between the teams. targetPlayerShare is your share of your team's total (an even share is about 17%). If you changed role, only deaths, kills and final hits keep it, because the other shares depend on role.
+- matchPerformance.team: team totals for each stat and the gap between the teams. targetPlayerShare is your share of your team's total (an even share is about 17%), and targetPlayerShareStrength (deaths, kills and final hits only) is the strongest wording that share allows, using the same scale as a stat's strength. If you changed role, only deaths, kills and final hits keep it, because the other shares depend on role.
 - pickAlternatives (post): your most-played hero this match (currentPick) vs your other heroes, against every enemy hero that appeared, including enemy swaps. vsEnemies is kept only for heroes you played: use it to explain a hero's matchups against what the enemy actually ran.
 
 Judge whether a stat was good or bad for a hero by rankStanding and by your recent games on that hero, not by your share of the team's total.
@@ -73,8 +77,10 @@ The focus is how you played. Only bring up role balance if a team gap points to 
 Don't add a title."""
 
 CANDIDATE_FIELDS = """- result: win or loss.
-- heroesByPlayTime: each hero played 2+ minutes, longest first, with shareOfMatch. notableStats lists only the stats that stood out, each with weightedPriority, reasons, thisMatchTotal, thisMatchPerMin, rankStanding (where this game sits among games on that hero at your rank, e.g. "top 6%"; quote it as given), your recent medians per min on that hero (overall, in wins, in losses), differsInYourWinsAndLosses and thisMatchResembles. A hero with no notableStats was unremarkable.
+- heroesByPlayTime: each hero played 2+ minutes, longest first, with shareOfMatch. notableStats lists only the stats that stood out, each with weightedPriority, reasons, thisMatchTotal, thisMatchPerMin, rankStanding (a sentence the server wrote placing this game among games on that hero by all players at your rank, e.g. "more damage taken than 81% of games on this hero by Diamond+ players"; base any rank comparison on it, and keep who it compares against: other players' games, never your own), your recent medians per min on that hero (overall, in wins, in losses), differsInYourWinsAndLosses and thisMatchResembles. A hero with no notableStats was unremarkable.
 - differsInYourWinsAndLosses = true: in your recent games on that hero, this stat is clearly different in your wins than in your losses, so it tends to decide your results on that hero. thisMatchResembles says whether this game looked like your wins or your losses. It is about your history on the hero, not about what won this game.
+- winsVsLosses: a sentence the server wrote comparing your wins and losses on that hero, and which one this match looked like. Base any wins/losses comparison on it, in your own words; never work out the direction yourself.
+- strength (on each notable stat and each teamShares entry): the strongest wording it allows. """ + STRENGTH_WORDS + """
 - shortSampleHeroes: heroes played under 2 minutes, with totals only. Never make them a highlight.
 - teamShares: your share of your team's deaths, kills and final hits across the whole match, against an even share of about 17%. Good for things like "you had a quarter of your team's deaths even though you won".
 - priorityScore (0 to 1): how much each stat should count on its own hero: how far it is from the middle of that hero's games at your rank, raised to at least 0.75 when it decides your results and was outside your usual; for teamShares, how far your share is from even. secondary = true marks assists and healing on vanguards and duelists, which score half.

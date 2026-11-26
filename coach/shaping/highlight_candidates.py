@@ -1,5 +1,4 @@
-ROLE_NEUTRAL_STATS = ["deaths", "kills", "finalHits"]
-EVEN_TEAM_SHARE = 0.17
+from coach.shaping.review_rules import EVEN_TEAM_SHARE, ROLE_NEUTRAL_STATS
 
 
 def priority_of(entry: dict) -> float:
@@ -38,6 +37,7 @@ def team_shares(team: dict) -> list[dict]:
                 "stat": stat_name,
                 "priorityScore": round(deviation_from_even_share(share), 2),
                 "yourShareOfTeamTotal": share,
+                "strength": team[stat_name].get("targetPlayerShareStrength"),
                 "evenShare": EVEN_TEAM_SHARE,
                 "teamTotal": team[stat_name]["myTeam"],
             }
